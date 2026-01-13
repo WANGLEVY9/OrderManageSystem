@@ -1,0 +1,45 @@
+:root {
+  --bg-soft: #f5f7fb;
+  --text-main: #1d2433;
+  --card-radius: 12px;
+  --card-padding: 16px;
+  --brand: #409eff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 15px;
+  color: var(--text-main);
+  background: linear-gradient(135deg, #f8fbff 0%, #eef2f7 100%);
+}
+
+.el-card {
+  border-radius: var(--card-radius);
+}
+
+.section-title {
+  font-weight: 700;
+  font-size: 17px;
+  margin-bottom: 12px;
+}
+
+.helper-text {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.stat-pill {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(64, 158, 255, 0.1);
+  color: #2f5ea9;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
