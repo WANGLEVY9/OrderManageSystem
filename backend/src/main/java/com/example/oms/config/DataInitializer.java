@@ -44,6 +44,9 @@ public class DataInitializer {
                 r.setPermissions(new HashSet<>(List.of(orderRead, orderCreate, orderWrite)));
                 return roleRepository.save(r);
             });
+            // ensure permissions synced even if role already exists
+            adminRole.setPermissions(new HashSet<>(List.of(orderRead, orderCreate, orderWrite)));
+            roleRepository.save(adminRole);
 
             roleRepository.findByCode("ROLE_USER").orElseGet(() -> {
                 Role r = new Role();
@@ -52,11 +55,19 @@ public class DataInitializer {
                 r.setPermissions(new HashSet<>(List.of(orderRead, orderCreate)));
                 return roleRepository.save(r);
             });
+            // refresh ROLE_USER permissions to avoid stale mapping
+            roleRepository.findByCode("ROLE_USER").ifPresent(r -> {
+                r.setPermissions(new HashSet<>(List.of(orderRead, orderCreate)));
+                roleRepository.save(r);
+            });
 
-            if (userRepository.findByUsername("admin").isEmpty()) {
-                User admin = buildUser("admin", "admin123", Set.of(adminRole), passwordEncoder);
-                userRepository.save(admin);
-            }
+            // Ensure admin账号存在且密码/角色正确（防止历史数据缺失导致无法登录）
+            User admin = userRepository.findByUsername("admin").orElseGet(User::new);
+            admin.setUsername("admin");
+            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setEnabled(true);
+            admin.setRoles(Set.of(adminRole));
+            userRepository.save(admin);
 
             seedUsers(userRepository, passwordEncoder, adminRole, roleRepository.findByCode("ROLE_USER").orElseThrow());
             seedProducts(productRepository);
@@ -109,34 +120,35 @@ public class DataInitializer {
             return;
         }
         List<Product> products = List.of(
-                buildProduct("iPhone 15", new BigDecimal("6999")),
-                buildProduct("MacBook Air", new BigDecimal("8999")),
-                buildProduct("iPad Pro", new BigDecimal("7699")),
-                buildProduct("Apple Watch", new BigDecimal("2999")),
-                buildProduct("AirPods Pro", new BigDecimal("1999")),
-                buildProduct("ThinkPad X1", new BigDecimal("10999")),
-                buildProduct("Dell XPS 13", new BigDecimal("9999")),
-                buildProduct("Surface Pro", new BigDecimal("7999")),
-                buildProduct("Nintendo Switch", new BigDecimal("2499")),
-                buildProduct("PS5", new BigDecimal("3899")),
-                buildProduct("Kindle Scribe", new BigDecimal("2099")),
-                buildProduct("Sony WH-1000XM5", new BigDecimal("2899")),
-                buildProduct("Logitech MX Master 3S", new BigDecimal("799")),
-                buildProduct("Keychron K2", new BigDecimal("599")),
-                buildProduct("Raspberry Pi 5", new BigDecimal("499")),
-                buildProduct("DJI Mini 4", new BigDecimal("4999")),
-                buildProduct("GoPro Hero 12", new BigDecimal("4299")),
-                buildProduct("Canon EOS R7", new BigDecimal("9999")),
-                buildProduct("Sony A7 IV", new BigDecimal("16999")),
-                buildProduct("UltraWide Monitor", new BigDecimal("2999"))
+                buildProduct("iPhone 15", new BigDecimal("6999"), "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600"),
+                buildProduct("MacBook Air", new BigDecimal("8999"), "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600"),
+                buildProduct("iPad Pro", new BigDecimal("7699"), "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600"),
+                buildProduct("Apple Watch", new BigDecimal("2999"), "https://images.unsplash.com/photo-1519741497674-611481863552?w=600"),
+                buildProduct("AirPods Pro", new BigDecimal("1999"), "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=600"),
+                buildProduct("ThinkPad X1", new BigDecimal("10999"), "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600"),
+                buildProduct("Dell XPS 13", new BigDecimal("9999"), "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600"),
+                buildProduct("Surface Pro", new BigDecimal("7999"), "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600"),
+                buildProduct("Nintendo Switch", new BigDecimal("2499"), "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600"),
+                buildProduct("PS5", new BigDecimal("3899"), "https://images.unsplash.com/photo-1593642634315-48f5414c3ad9?w=600"),
+                buildProduct("Kindle Scribe", new BigDecimal("2099"), "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=600"),
+                buildProduct("Sony WH-1000XM5", new BigDecimal("2899"), "https://images.unsplash.com/photo-1518443952241-2b51c0c0c31c?w=600"),
+                buildProduct("Logitech MX Master 3S", new BigDecimal("799"), "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600"),
+                buildProduct("Keychron K2", new BigDecimal("599"), "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600"),
+                buildProduct("Raspberry Pi 5", new BigDecimal("499"), "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600"),
+                buildProduct("DJI Mini 4", new BigDecimal("4999"), "https://images.unsplash.com/photo-1508615039623-a25605d2b022?w=600"),
+                buildProduct("GoPro Hero 12", new BigDecimal("4299"), "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?w=600"),
+                buildProduct("Canon EOS R7", new BigDecimal("9999"), "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?w=600"),
+                buildProduct("Sony A7 IV", new BigDecimal("16999"), "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?w=600"),
+                buildProduct("UltraWide Monitor", new BigDecimal("2999"), "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600")
         );
         productRepository.saveAll(products);
     }
 
-    private Product buildProduct(String name, BigDecimal price) {
+    private Product buildProduct(String name, BigDecimal price, String imageUrl) {
         Product p = new Product();
         p.setName(name);
         p.setPrice(price);
+        p.setImageUrl(imageUrl);
         return p;
     }
 

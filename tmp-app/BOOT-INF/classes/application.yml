@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: oms
+  datasource:
+    url: jdbc:mysql://localhost:3306/oms?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    # Allow cleaning the schema when Flyway detects a half-applied migration
+    clean-disabled: false
+    clean-on-validation-error: true
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+    consumer:
+      group-id: oms-consumer
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+server:
+  port: 8080
+
+jwt:
+  secret: change-me-to-a-long-random-secret
+  expiration-minutes: 120
+
+ratelimit:
+  enabled: true
+  limit: 100
+  window-seconds: 60
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: INFO
+    org.springframework.kafka: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

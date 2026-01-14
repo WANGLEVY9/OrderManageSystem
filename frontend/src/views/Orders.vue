@@ -9,11 +9,20 @@
         <el-form-item label="单价">
           <el-input-number v-model.number="newProduct.price" :min="0" :step="1" />
         </el-form-item>
+        <el-form-item label="图片 URL">
+          <el-input v-model="newProduct.imageUrl" placeholder="https://..." style="width: 260px" />
+        </el-form-item>
         <el-button type="primary" @click="addProduct">保存商品</el-button>
       </el-form>
       <el-table :data="products" size="small" class="mt8">
         <el-table-column prop="name" label="商品" />
         <el-table-column prop="price" label="单价" width="120" />
+        <el-table-column label="图片" width="120">
+          <template #default="scope">
+            <el-image v-if="scope.row.imageUrl" :src="scope.row.imageUrl" fit="cover" style="width:60px;height:60px" />
+            <span v-else class="helper-text">暂无</span>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
 
@@ -46,6 +55,11 @@
               <el-input-number v-model.number="newItem.price" :min="0" :step="1" class="full" />
             </el-form-item>
           </el-col>
+          <el-col :span="6">
+            <el-form-item label="图片 URL（可选）">
+              <el-input v-model="newItem.imageUrl" placeholder="https://..." />
+            </el-form-item>
+          </el-col>
         </el-row>
         <el-row :gutter="12">
           <el-col :span="6">
@@ -63,6 +77,12 @@
         <el-table-column prop="productName" label="商品" />
         <el-table-column prop="quantity" label="数量" width="120" />
         <el-table-column prop="price" label="单价" width="120" />
+        <el-table-column label="图片" width="140">
+          <template #default="scope">
+            <el-image v-if="scope.row.imageUrl" :src="scope.row.imageUrl" fit="cover" style="width:60px;height:60px" />
+            <span v-else class="helper-text">—</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="120">
           <template #default="scope">
             <el-button size="small" type="danger" @click="remove(scope.$index)">删除</el-button>
@@ -163,8 +183,8 @@ const products = ref([])
 const users = ref([])
 const selectedUserId = ref(null)
 const selectedUserFilter = ref(null)
-const newProduct = ref({ name: '', price: 0 })
-const newItem = ref({ productId: null, productName: '', price: 0, quantity: 1 })
+const newProduct = ref({ name: '', price: 0, imageUrl: '' })
+const newItem = ref({ productId: null, productName: '', price: 0, quantity: 1, imageUrl: '' })
 const items = ref([])
 const orders = ref([])
 const router = useRouter()
@@ -180,6 +200,7 @@ function onProductChange() {
   if (product) {
     newItem.value.productName = product.name
     newItem.value.price = Number(product.price)
+    newItem.value.imageUrl = product.imageUrl || ''
   }
 }
 
@@ -193,9 +214,10 @@ function addItem() {
     productId: newItem.value.productId || null,
     productName: product ? product.name : newItem.value.productName,
     price: product ? Number(product.price) : newItem.value.price,
-    quantity: newItem.value.quantity
+    quantity: newItem.value.quantity,
+    imageUrl: product ? product.imageUrl : newItem.value.imageUrl
   })
-  newItem.value = { productId: null, productName: '', price: 0, quantity: 1 }
+  newItem.value = { productId: null, productName: '', price: 0, quantity: 1, imageUrl: '' }
 }
 
 function remove(index) {
@@ -283,13 +305,14 @@ function openEdit(order) {
     productId: i.product?.id || null,
     productName: i.productName,
     price: Number(i.price),
-    quantity: i.quantity
+    quantity: i.quantity,
+    imageUrl: i.imageUrl || ''
   }))
   editDialog.value = true
 }
 
 function addEditItem() {
-  editItems.value.push({ productId: null, productName: '', price: 0, quantity: 1 })
+  editItems.value.push({ productId: null, productName: '', price: 0, quantity: 1, imageUrl: '' })
 }
 
 function syncEditProduct(row) {
@@ -297,6 +320,7 @@ function syncEditProduct(row) {
   if (product) {
     row.productName = product.name
     row.price = Number(product.price)
+    row.imageUrl = product.imageUrl || ''
   }
 }
 
@@ -332,7 +356,7 @@ async function addProduct() {
   try {
     await createProduct(newProduct.value)
     ElMessage.success('商品已创建')
-    newProduct.value = { name: '', price: 0 }
+    newProduct.value = { name: '', price: 0, imageUrl: '' }
     loadProducts()
   } catch (e) {
     ElMessage.error(e.response?.data?.message || '创建失败')

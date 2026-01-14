@@ -28,6 +28,9 @@ public class Product {
     @Column(nullable = false)
     private BigDecimal price;
 
+    @Column(name = "image_url", length = 512)
+    private String imageUrl;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 }

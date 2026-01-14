@@ -29,6 +29,12 @@
         <el-table-column prop="productName" label="商品" />
         <el-table-column prop="quantity" label="数量" width="120" />
         <el-table-column prop="price" label="单价" width="120" />
+        <el-table-column label="图片" width="140">
+          <template #default="scope">
+            <el-image v-if="scope.row.imageUrl" :src="scope.row.imageUrl" fit="cover" style="width:60px;height:60px" />
+            <span v-else class="helper-text">—</span>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
 

@@ -51,9 +51,11 @@ public class OrderService {
                 item.setProduct(product);
                 item.setProductName(product.getName());
                 item.setPrice(product.getPrice());
+                item.setImageUrl(product.getImageUrl());
             } else {
                 item.setProductName(itemRequest.getProductName());
                 item.setPrice(itemRequest.getPrice());
+                item.setImageUrl(itemRequest.getImageUrl());
             }
             item.setQuantity(itemRequest.getQuantity());
             item.setOrder(order);
@@ -87,9 +89,11 @@ public class OrderService {
                 item.setProduct(product);
                 item.setProductName(product.getName());
                 item.setPrice(product.getPrice());
+                item.setImageUrl(product.getImageUrl());
             } else {
                 item.setProductName(itemRequest.getProductName());
                 item.setPrice(itemRequest.getPrice());
+                item.setImageUrl(itemRequest.getImageUrl());
             }
             item.setQuantity(itemRequest.getQuantity());
             item.setOrder(order);

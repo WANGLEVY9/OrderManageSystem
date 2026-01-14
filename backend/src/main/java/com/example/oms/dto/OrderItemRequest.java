@@ -25,6 +25,8 @@ public class OrderItemRequest {
     @DecimalMin(value = "0.0", inclusive = true)
     private BigDecimal price;
 
+    private String imageUrl;
+
     @AssertTrue(message = "productId or (productName and price) must be provided")
     public boolean isValidItem() {
         return productId != null || (StringUtils.hasText(productName) && price != null);

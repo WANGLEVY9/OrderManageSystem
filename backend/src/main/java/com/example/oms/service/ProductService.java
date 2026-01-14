@@ -29,6 +29,7 @@ public class ProductService {
         Product product = new Product();
         product.setName(request.getName());
         product.setPrice(request.getPrice());
+        product.setImageUrl(request.getImageUrl());
         return productRepository.save(product);
     }
 
