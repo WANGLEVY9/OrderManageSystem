@@ -4,17 +4,13 @@
 
 **选择：订单管理系统（Order Management System）**
 
-理由：
-
-* 业务流程天然复杂（下单 → 支付 → 发货 → 完成 / 取消）
-* 非常适合：
+* 业务流程（下单 → 支付 → 发货 → 完成 / 取消）
+* 技术融合：
 
   * Kafka 异步消息
   * Redis 多数据结构
   * 权限控制（用户 / 管理员）
   * 接口访问统计
-* 比学生管理系统更“贴近真实生产系统”，更容易写出高质量总结文档
-
 ---
 
 ## 快速开始
@@ -254,12 +250,13 @@ Kafka Consumer → Log / Async Task
 services:
   mysql
   redis
+  zookeeper
   kafka
   backend
   frontend
 ```
-
-一键启动整个系统
+![alt text](d8a0f87c11d56d761698ab69d58dc741.png)
+实现一键启动整个系统
 
 ---
 

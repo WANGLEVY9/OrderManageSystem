@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS products (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    price DECIMAL(19,2) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE order_items ADD COLUMN product_id BIGINT NULL;
+ALTER TABLE order_items
+    ADD CONSTRAINT fk_items_product FOREIGN KEY (product_id) REFERENCES products(id);
+CREATE INDEX idx_items_product ON order_items(product_id);

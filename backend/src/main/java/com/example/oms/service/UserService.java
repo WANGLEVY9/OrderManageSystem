@@ -1,6 +1,7 @@
 package com.example.oms.service;
 
 import com.example.oms.dto.RegisterRequest;
+import com.example.oms.dto.UserUpdateRequest;
 import com.example.oms.model.Permission;
 import com.example.oms.model.Role;
 import com.example.oms.model.User;
@@ -23,15 +24,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository,
-                       RoleRepository roleRepository,
-                       PermissionRepository permissionRepository,
-                       PasswordEncoder passwordEncoder) {
+            RoleRepository roleRepository,
+            PermissionRepository permissionRepository,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.permissionRepository = permissionRepository;
@@ -68,6 +70,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
+    public List<Role> findRoles() {
+        return roleRepository.findAll();
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
@@ -91,5 +97,30 @@ public class UserService implements UserDetailsService {
 
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Transactional
+    public User updateUser(Long id, UserUpdateRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (request.getUsername() != null && !request.getUsername().equals(user.getUsername())) {
+            if (userRepository.existsByUsername(request.getUsername())) {
+                throw new IllegalArgumentException("Username already exists");
+            }
+            user.setUsername(request.getUsername());
+        }
+        user.setEnabled(request.getEnabled());
+        if (request.getRoleCodes() != null && !request.getRoleCodes().isEmpty()) {
+            Set<Role> roles = request.getRoleCodes().stream()
+                    .map(code -> roleRepository.findByCode(code)
+                    .orElseThrow(() -> new IllegalArgumentException("Role not found: " + code)))
+                    .collect(Collectors.toSet());
+            user.setRoles(roles);
+        }
+        return userRepository.save(user);
     }
 }

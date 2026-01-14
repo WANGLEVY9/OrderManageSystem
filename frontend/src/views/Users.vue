@@ -2,7 +2,7 @@
   <div class="users">
     <el-card>
       <div class="card-title">用户列表（管理员）</div>
-      <div class="helper-text">支持查看用户详情，编辑操作需后端开启对应接口。</div>
+      <div class="helper-text">支持查看、修改用户名 / 状态 / 角色。</div>
       <el-table :data="users" style="width: 100%" class="mt8">
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="username" label="用户名" />
@@ -25,18 +25,24 @@
       </el-table>
     </el-card>
 
-    <el-drawer v-model="drawerVisible" title="用户详情" :with-header="true" size="400px">
-      <el-descriptions :column="1" border>
-        <el-descriptions-item label="ID">{{ currentUser.id }}</el-descriptions-item>
-        <el-descriptions-item label="用户名">{{ currentUser.username }}</el-descriptions-item>
-        <el-descriptions-item label="状态">
-          <el-tag :type="currentUser.enabled ? 'success' : 'info'">{{ currentUser.enabled ? '启用' : '停用' }}</el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="角色">
-          <el-tag v-for="r in currentUser.roles || []" :key="r.code" class="mr4">{{ r.code }}</el-tag>
-        </el-descriptions-item>
-      </el-descriptions>
-      <div class="helper-text mt12">需要修改用户信息时，请在后端开放更新接口，前端已预留入口。</div>
+    <el-drawer v-model="drawerVisible" title="用户详情" :with-header="true" size="420px">
+      <el-form label-position="top">
+        <el-form-item label="用户名">
+          <el-input v-model="form.username" />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-switch v-model="form.enabled" active-text="启用" inactive-text="停用" />
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="form.roleCodes" multiple placeholder="选择角色" style="width: 100%">
+            <el-option v-for="r in roles" :key="r.code" :label="r.code" :value="r.code" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="drawerVisible = false">取消</el-button>
+        <el-button type="primary" @click="save">保存</el-button>
+      </template>
     </el-drawer>
   </div>
 </template>
@@ -44,15 +50,18 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { listUsers } from '../api/users'
+import { listUsers, updateUser, listRoles } from '../api/users'
 
 const users = ref([])
 const drawerVisible = ref(false)
 const currentUser = ref({})
+const form = ref({ username: '', enabled: true, roleCodes: [] })
+const roles = ref([])
 
 async function load() {
   try {
     users.value = await listUsers()
+    roles.value = await listRoles()
   } catch (e) {
     ElMessage.error('需要管理员权限')
   }
@@ -62,12 +71,27 @@ onMounted(load)
 
 function openDetail(row) {
   currentUser.value = row
+  form.value = {
+    username: row.username,
+    enabled: row.enabled,
+    roleCodes: (row.roles || []).map((r) => r.code)
+  }
   drawerVisible.value = true
 }
 
 function editUser(row) {
-  ElMessage.info('前端已打开编辑入口，需后端提供更新接口后生效')
   openDetail(row)
+}
+
+async function save() {
+  try {
+    await updateUser(currentUser.value.id, form.value)
+    ElMessage.success('已更新')
+    drawerVisible.value = false
+    load()
+  } catch (e) {
+    ElMessage.error(e.response?.data?.message || '更新失败')
+  }
 }
 </script>
 

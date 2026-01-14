@@ -21,6 +21,9 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+    # Allow cleaning the schema when Flyway detects a half-applied migration
+    clean-disabled: false
+    clean-on-validation-error: true
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
     consumer:

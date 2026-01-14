@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class StatsService {
+
     private static final String API_COUNTER = "api:counter";
     private static final String API_RANK = "api:rank";
     private final StringRedisTemplate redisTemplate;
@@ -30,10 +31,15 @@ public class StatsService {
         return keys.stream().collect(Collectors.toMap(
                 k -> k.substring((API_COUNTER + ":").length()),
                 k -> {
-                    Object value = redisTemplate.opsForValue().get(k);
-                    if (value instanceof Integer i) return i.longValue();
-                    if (value instanceof Long l) return l;
-                    return 0L;
+                    String value = redisTemplate.opsForValue().get(k);
+                    if (value == null) {
+                        return 0L;
+                    }
+                    try {
+                        return Long.parseLong(value);
+                    } catch (NumberFormatException ex) {
+                        return 0L;
+                    }
                 }
         ));
     }
@@ -44,9 +50,9 @@ public class StatsService {
             return Map.of();
         }
         return tuples.stream()
-            .collect(Collectors.toMap(
-                tuple -> tuple.getValue().toString(),
-                tuple -> tuple.getScore()
-            ));
+                .collect(Collectors.toMap(
+                        tuple -> tuple.getValue().toString(),
+                        tuple -> tuple.getScore()
+                ));
     }
 }
