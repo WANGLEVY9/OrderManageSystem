@@ -3,9 +3,14 @@
     <el-container>
       <el-aside width="240px" class="aside">
         <div class="logo">OMS</div>
-        <el-menu :default-active="active" router class="nav">
+        <el-menu :default-active="active" router class="nav" :default-openeds="defaultOpeneds">
           <el-menu-item index="/">仪表盘</el-menu-item>
-          <el-menu-item index="/orders">订单管理</el-menu-item>
+          <el-sub-menu index="orders-group">
+            <template #title>订单管理</template>
+            <el-menu-item index="/orders/products">商品管理</el-menu-item>
+            <el-menu-item index="/orders/create">新建订单</el-menu-item>
+            <el-menu-item index="/orders/list">订单列表</el-menu-item>
+          </el-sub-menu>
           <el-menu-item index="/stats">接口统计</el-menu-item>
           <el-menu-item index="/users">用户管理</el-menu-item>
           <el-menu-item @click="logout">退出登录</el-menu-item>
@@ -30,6 +35,7 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const active = computed(() => route.path)
+const defaultOpeneds = computed(() => (route.path.startsWith('/orders') ? ['orders-group'] : []))
 
 function logout() {
   auth.logout()
