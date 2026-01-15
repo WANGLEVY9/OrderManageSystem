@@ -11,6 +11,7 @@ com\example\oms\util\JwtUtil.class
 com\example\oms\service\StatsService.class
 com\example\oms\controller\OrderController.class
 com\example\oms\controller\ProductController.class
+com\example\oms\config\OpenApiConfig.class
 com\example\oms\repository\PermissionRepository.class
 com\example\oms\controller\StatsController.class
 com\example\oms\OmsApplication.class

@@ -34,6 +34,7 @@ E:\Codes\2025-ServerSideDevelopment\OrderManagementSystem\backend\src\main\java\
 E:\Codes\2025-ServerSideDevelopment\OrderManagementSystem\backend\src\main\java\com\example\oms\repository\RoleRepository.java
 E:\Codes\2025-ServerSideDevelopment\OrderManagementSystem\backend\src\main\java\com\example\oms\model\OrderItem.java
 E:\Codes\2025-ServerSideDevelopment\OrderManagementSystem\backend\src\main\java\com\example\oms\repository\UserRepository.java
+E:\Codes\2025-ServerSideDevelopment\OrderManagementSystem\backend\src\main\java\com\example\oms\config\OpenApiConfig.java
 E:\Codes\2025-ServerSideDevelopment\OrderManagementSystem\backend\src\main\java\com\example\oms\dto\ProductRequest.java
 E:\Codes\2025-ServerSideDevelopment\OrderManagementSystem\backend\src\main\java\com\example\oms\config\DataInitializer.java
 E:\Codes\2025-ServerSideDevelopment\OrderManagementSystem\backend\src\main\java\com\example\oms\config\RateLimitFilter.java
