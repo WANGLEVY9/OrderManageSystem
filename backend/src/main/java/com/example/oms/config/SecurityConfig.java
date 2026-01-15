@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final RateLimitFilter rateLimitFilter;
 
@@ -31,9 +32,18 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/health").permitAll()
-                        .anyRequest().authenticated())
+                .requestMatchers(
+                        "/api/auth/**",
+                        "/v3/api-docs/**",
+                        "/v3/api-docs.yaml",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/doc.html",
+                        "/swagger-resources/**",
+                        "/webjars/**"
+                ).permitAll()
+                .requestMatchers(HttpMethod.GET, "/health").permitAll()
+                .anyRequest().authenticated())
                 .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

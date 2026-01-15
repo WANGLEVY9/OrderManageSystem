@@ -18,6 +18,7 @@ import java.util.Map;
 
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
+
     private final StringRedisTemplate redisTemplate;
     private final boolean enabled;
     private final long limit;
@@ -25,9 +26,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public RateLimitFilter(StringRedisTemplate redisTemplate,
-                           @Value("${ratelimit.enabled:true}") boolean enabled,
-                           @Value("${ratelimit.limit:100}") long limit,
-                           @Value("${ratelimit.window-seconds:60}") long windowSeconds) {
+            @Value("${ratelimit.enabled:true}") boolean enabled,
+            @Value("${ratelimit.limit:100}") long limit,
+            @Value("${ratelimit.window-seconds:60}") long windowSeconds) {
         this.redisTemplate = redisTemplate;
         this.enabled = enabled;
         this.limit = limit;
@@ -37,7 +38,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return !enabled || path.startsWith("/api/auth") || path.startsWith("/swagger") || path.startsWith("/v3") || "/health".equals(path);
+        return !enabled
+                || path.startsWith("/api/auth")
+                || path.startsWith("/swagger")
+                || path.startsWith("/v3")
+                || path.startsWith("/doc.html")
+                || path.startsWith("/webjars")
+                || path.startsWith("/swagger-resources")
+                || "/health".equals(path);
     }
 
     @Override
