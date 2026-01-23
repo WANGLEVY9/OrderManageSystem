@@ -16,6 +16,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.oms.mapper.OrderMapper;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -27,14 +29,26 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
+    // 注入 MyBatis Mapper
+    private final OrderMapper orderMapper;
+
     public OrderService(OrderRepository orderRepository,
             OrderOperationLogRepository logRepository,
             ProductRepository productRepository,
-            KafkaTemplate<String, String> kafkaTemplate) {
+            KafkaTemplate<String, String> kafkaTemplate,
+            OrderMapper orderMapper) {
         this.orderRepository = orderRepository;
         this.logRepository = logRepository;
         this.productRepository = productRepository;
         this.kafkaTemplate = kafkaTemplate;
+        this.orderMapper = orderMapper;
+    }
+
+    /**
+     * 使用 MyBatis 查询订单总数（示例）
+     */
+    public long countOrdersByMybatis() {
+        return orderMapper.countOrders();
     }
 
     @Transactional
