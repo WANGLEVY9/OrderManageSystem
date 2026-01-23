@@ -1,7 +1,13 @@
 import axios from 'axios'
 import { useAuthStore } from '../store/auth'
 
-const http = axios.create({ baseURL: '/api' })
+const http = axios.create({
+  baseURL: '/api',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+})
 
 http.interceptors.request.use((config) => {
   const auth = useAuthStore()
