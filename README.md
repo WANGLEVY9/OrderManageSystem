@@ -1,6 +1,6 @@
 ## 一、项目说明
 
-订单管理系统（Order Management System），覆盖下单 / 支付流转 / 审计 / 统计，按课程要求实现最高等级技术方案。
+订单管理系统（Order Management System），覆盖下单 / 支付流转 / 审计 / 统计。(NJUSE 2025Fall 服务端开发期末项目)
 
 - 后端：`backend/`
   - 入口与配置：应用启动 [backend/src/main/java/com/example/oms/OmsApplication.java](backend/src/main/java/com/example/oms/OmsApplication.java)，安全/限流/异常/数据初始化等配置位于 `config`（如 [backend/src/main/java/com/example/oms/config/SecurityConfig.java](backend/src/main/java/com/example/oms/config/SecurityConfig.java)、[backend/src/main/java/com/example/oms/config/RateLimitFilter.java](backend/src/main/java/com/example/oms/config/RateLimitFilter.java)）。
@@ -22,32 +22,29 @@
 - 前端栈：Vue 3 + Vite + Element Plus + Pinia + Vue Router + Axios（拦截器自动加 JWT），ECharts 展示统计。
 - 部署：后端多阶段镜像（maven:3.9 + temurin:21），前端 Nginx 静态服务；docker-compose 健康检查与依赖顺序；默认端口 8080/5173。
 
-## 三、按课程评分点逐条对照与示例
+## 三、项目技术说明
 
-### 1. 前端开发与展示（20 分）
+### 1. 前端开发与展示
 - 前后端分离（10 分）：独立 `frontend/` 工程，Axios 调用后端；路由与守卫 [frontend/src/router/index.js](frontend/src/router/index.js)。
 - 多层页面逻辑跳转（7 分）：登录 → Dashboard → 订单列表 → 订单详情 → 操作记录（`views/Orders.vue`、`views/OrderDetail.vue`）。
 - 图片展示（10 分）：管理员创建商品可填图片 URL，列表与订单明细中以 `el-image` 预览商品图（见 [frontend/src/views/Orders.vue](frontend/src/views/Orders.vue)、[frontend/src/views/OrderDetail.vue](frontend/src/views/OrderDetail.vue)）。
 - CSS 样式（10 分）：Element Plus 主题化 + 自定义样式 [frontend/src/assets/global.css](frontend/src/assets/global.css)；表单/表格/状态胶囊统一风格。
 
-### 2. 安全管理（20 分）
+### 2. 安全管理
 - 基于 Redis 的登录（10 分）：登录生成 JWT，状态写 Redis（`StatsService` 计数、RedisConfig 连接）。
 - 权限持久化与授权（满分项）：角色/权限模型落库（`permissions`、`roles`、`user_roles`、`role_permissions` 表，见 [backend/src/main/resources/db/migration/V1__init.sql](backend/src/main/resources/db/migration/V1__init.sql)），DataInitializer 预置管理员/权限；方法级 `@PreAuthorize` 结合持久化权限控制接口访问。
 - 密码加密：BCrypt（UserService 注册与 DataInitializer 创建默认用户 [backend/src/main/java/com/example/oms/config/DataInitializer.java](backend/src/main/java/com/example/oms/config/DataInitializer.java)）。
 
-### 3. 基本功能（30 分）
+### 3. 基本功能
 - 重要接口统计（10 分）：AOP 计数切面 [backend/src/main/java/com/example/oms/aspect/ApiMetricsAspect.java](backend/src/main/java/com/example/oms/aspect/ApiMetricsAspect.java) 将接口调用写入 Redis（String/ZSet），前端 `/stats` 页面 ECharts 展示排行与趋势。
 - 数据持久化（10 分）：JPA Repository（如 [backend/src/main/java/com/example/oms/repository/OrderRepository.java](backend/src/main/java/com/example/oms/repository/OrderRepository.java)），提供 MyBatis 示例 `OrderMapper` 便于切换。
 - Kafka 消息（10 分）：下单/状态变更在 [backend/src/main/java/com/example/oms/service/OrderService.java](backend/src/main/java/com/example/oms/service/OrderService.java) 中发送，消费者 [backend/src/main/java/com/example/oms/service/OrderEventConsumer.java](backend/src/main/java/com/example/oms/service/OrderEventConsumer.java) 记录日志。
 - Redis 多数据结构（10 分）：String/ZSet 用于计数与排行（`StatsService`），可扩展 Hash/List/TTL；登录态与限流依赖 Redis 连接。
 
-### 4. 部署（15 分 + 附加分）
+### 4. 部署
 - Dockerfile（12 分）：后端多阶段镜像 [backend/Dockerfile](backend/Dockerfile)，前端镜像 [frontend/Dockerfile](frontend/Dockerfile)。
 - docker-compose（15 分）：一键启动 [docker-compose.yml](docker-compose.yml)，含 mysql/redis/kafka/zookeeper/backend/frontend 健康检查与依赖顺序。
 - Kubernetes（附加）：可依据现有镜像与环境变量直接编写 Deployment/Service/Ingress（未附清单，可按需要补充）。
-
-### 5. 文档（15 分）
-- 本 README 覆盖架构、功能、运行方式，对照评分要求，满足 2000 字内说明需求。
 
 ## 四、运行与运维指令
 
